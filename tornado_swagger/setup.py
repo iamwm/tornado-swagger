@@ -84,7 +84,7 @@ def setup_swagger_for_mg(routes: typing.List[tuple],
                          schemes: list = None,
                          security_definitions: dict = None
                          ):
-    routes_for_swagger = [tornado.web.url(x[0], x[1]) for x in routes if issubclass(tornado.web.RequestHandler, x)]
+    routes_for_swagger = [tornado.web.url(x[0], x[1]) for x in routes if issubclass(tornado.web.RequestHandler, x[1])]
     swagger_schema = generate_doc_from_endpoints(
         routes_for_swagger,
         api_base_url=api_base_url,
