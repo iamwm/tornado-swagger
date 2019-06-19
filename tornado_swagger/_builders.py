@@ -48,12 +48,20 @@ def _build_doc_from_func_doc(handler):
 
     for method in handler.SUPPORTED_METHODS:
         method = method.lower()
-        doc = getattr(handler, method).__doc__
-
-        if doc is not None and '---' in doc:
-            out.update({
-                method: extract_swagger_docs(doc)
-            })
+        method_in_mg = f'{method.lower()}_process'
+        if hasattr(handler, method_in_mg):
+            doc_in_mg = getattr(handler, method_in_mg).__doc__
+            if doc_in_mg is not None and '----' in doc:
+                out.update({
+                    method: extract_swagger_docs(doc_in_mg)
+                })
+            continue
+        elif hasattr(handler, method):
+            doc = getattr(handler, method).__doc__
+            if doc is not None and '---' in doc:
+                out.update({
+                    method: extract_swagger_docs(doc)
+                })
 
     return out
 

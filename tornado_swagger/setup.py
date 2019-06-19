@@ -71,3 +71,47 @@ def setup_swagger(routes: typing.List[tornado.web.URLSpec],
                 json.dumps(swagger_schema)
             )
         )
+
+
+def setup_swagger_for_mg(routes: typing.List[tuple],
+                         *,
+                         swagger_url: str = '/api/swagger',
+                         api_base_url: str = '/',
+                         description: str = 'Swagger API definition',
+                         api_version: str = '1.0.0',
+                         title: str = 'Swagger API',
+                         contact: str = '',
+                         schemes: list = None,
+                         security_definitions: dict = None
+                         ):
+    routes_for_swagger = [tornado.web.url(x[0], x[1]) for x in routes if issubclass(tornado.web.RequestHandler, x)]
+    swagger_schema = generate_doc_from_endpoints(
+        routes_for_swagger,
+        api_base_url=api_base_url,
+        description=description,
+        api_version=api_version,
+        title=title,
+        contact=contact,
+        schemes=schemes,
+        security_definitions=security_definitions,
+    )
+
+    _swagger_url = ('/{}'.format(swagger_url)
+                    if not swagger_url.startswith('/')
+                    else swagger_url)
+    _base_swagger_url = _swagger_url.rstrip('/')
+
+    routes.extend(
+        [
+            (_swagger_url, SwaggerHomeHandler),
+            ('{}/'.format(_base_swagger_url), SwaggerHomeHandler),
+        ]
+    )
+
+    with open(os.path.join(STATIC_PATH, 'ui.jinja2'), 'r') as f:
+        SwaggerHomeHandler.SWAGGER_HOME_TEMPLATE = (
+            f.read().replace(
+                '{{ SWAGGER_SCHEMA }}',
+                json.dumps(swagger_schema)
+            )
+        )
