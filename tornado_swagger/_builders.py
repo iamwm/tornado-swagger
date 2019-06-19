@@ -51,7 +51,7 @@ def _build_doc_from_func_doc(handler):
         method_in_mg = f'{method.lower()}_process'
         if hasattr(handler, method_in_mg):
             doc_in_mg = getattr(handler, method_in_mg).__doc__
-            if doc_in_mg is not None and '----' in doc:
+            if doc_in_mg is not None and '---' in doc_in_mg:
                 out.update({
                     method: extract_swagger_docs(doc_in_mg)
                 })
